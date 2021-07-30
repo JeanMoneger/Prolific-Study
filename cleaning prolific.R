@@ -55,6 +55,8 @@ for (i in 1:nrow(data)) {
 data$numberError<-as.numeric(data$key_resp_7.corr) 
 data <- data%>% group_by(date) %>% mutate(Meanerror = mean(key_resp_7.corr, na.rm = T))
 data<-subset(data, data$Meanerror >= 0.66)
+# Four participants removed : 
+#which(table(data$date)==0)
 
 #Our analyses will be conducted on CORRECT Word answers
 #Remove wrong answers : we put all the correct answers in a different data frame
@@ -63,11 +65,24 @@ dataRT<- subset(data, data$key_resp_7.corr!=0 )
 
 
 #Compute average NVS & NGS scores
-data2<-subset(data, data$slider_2.rt > 1.5)
-data2<-data2%>%group_by(date, Echelle) %>% mutate(MeanNVSNGS = mean(slider_2.response, na.rm = T)) 
+# data2<-subset(data, data$slider_2.rt > 1.5) # Remove trials associated to answers less than 1.5 s.
+
+#### ALTERNATIVELY, IT MIGHT BE SMARTER TO REPLACE THOSE TRIALS WITH NA IN ORDER TO KEEP ORDER IN THE COMING STEPS, CONSIDER USING/
+ data2 <-data
+ data2[] <- lapply(data2, function(x) ifelse(data2$slider_2.rt <1.5, NA, data2$slider_2.rt))
+# nope !!! Does shiiiiiiiiit.
+ 
+ 
+ 
+data2<-data2%>%group_by(date, Echelle) %>% mutate(MeanNVSNGS = mean(slider_2.response)) 
+# 2 participants removed
+# which(table(data2$date)==0)
+
+
+
 #####WARNING : participants removed
 ###     2020-10-22_11h06.32.922
-###     2020-10-22_11h03.12.421
+###     2020-10-22_11h03.12.421 #But why?
 ###     2020-10-22_11h02.12.941
 ###     2020-10-22_10h58.02.161
 ###     2020-10-22_10h55.45.886
@@ -91,7 +106,7 @@ data2<-data2%>%group_by(date, Echelle) %>% mutate(MeanNVSNGS = mean(slider_2.res
 #Reverse-code reversed items :
 data$trials_4.thisIndex<-as.character(data$trials_4.thisIndex)
 
-for(i in 1:nrow(data)){
+for(i in 1:nrow(data)){ # Compute reverse scores
   if((data$trials_4.thisIndex[i]=="0" 
       | data$trials_4.thisIndex[i]=="10"
       |data$trials_4.thisIndex[i]== "7"
@@ -105,7 +120,38 @@ for(i in 1:nrow(data)){
 ####################################
 ####################################
 data3<-subset(data, data$slider_3.rt > 1.5)
-data3<-data3%>%group_by(date) %>% mutate(MeanSCS = mean(slider_3.response, na.rm = T)) 
+# data3<-data
+# data3[] <- lapply(data3, function(x) ifelse(data3$slider_3.rt <1.5, NA, data3$slider_3.rt)) # To replace by NA instead of stupidly removing
+
+# which(table(data3$date)==0) #1 participant removed
+
+# By sub scale
+# Self-Kindness Items: 2, 6
+# Note: It removes participants answering in < 1.5 seconds on both items
+dataSelfKindness<-data3%>%group_by(date) %>%  filter(trials_4.thisIndex == "1" | trials_4.thisIndex== "5") %>% mutate(MeanSelfKind = mean(slider_3.response, na.rm = T))  %>% distinct(date)
+
+# Self-Judgment Items: 11, 12
+# Note: It removes participants answering in < 1.5 seconds on both items
+dataSelfJudg<-data3%>%group_by(date) %>%  filter(trials_4.thisIndex == "10" | trials_4.thisIndex== "11") %>%mutate(MeanSelfJudg = mean(slider_3.response, na.rm = T)) %>% distinct(date)
+
+# Common Humanity Items: 5, 10
+# Note: It removes participants answering in < 1.5 seconds on both items
+dataSelfJudg<-data3%>%group_by(date) %>%  filter(trials_4.thisIndex == "10" | trials_4.thisIndex== "11") %>%mutate(MeanSelfJudg = mean(slider_3.response, na.rm = T)) %>% distinct(date)
+
+# Isolation Items: 4, 8
+# Note: It removes participants answering in < 1.5 seconds on both items
+dataSelfJudg<-data3%>%group_by(date) %>%  filter(trials_4.thisIndex == "10" | trials_4.thisIndex== "11") %>%mutate(MeanSelfJudg = mean(slider_3.response, na.rm = T)) %>% distinct(date)
+
+# Mindfulness Items: 3, 7
+# Note: It removes participants answering in < 1.5 seconds on both items
+dataSelfJudg<-data3%>%group_by(date) %>%  filter(trials_4.thisIndex == "10" | trials_4.thisIndex== "11") %>%mutate(MeanSelfJudg = mean(slider_3.response, na.rm = T)) %>% distinct(date)
+
+# Over-identified Items: 1, 9
+# Note: It removes participants answering in < 1.5 seconds on both items
+dataSelfJudg<-data3%>%group_by(date) %>%  filter(trials_4.thisIndex == "10" | trials_4.thisIndex== "11") %>%mutate(MeanSelfJudg = mean(slider_3.response, na.rm = T)) %>% distinct(date)
+
+
+
 
 #Compute GASP Scores
 data4<-subset(data, data$slider.rt > 0)
