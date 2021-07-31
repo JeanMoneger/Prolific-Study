@@ -14,7 +14,7 @@ data <- read.csv("dataFILE.csv") #Once again, path will change from one user to 
 ###########################
 ###### Data cleaning ######
 ###########################
-install.packages(dplyr)
+install.packages("dplyr")
 library(dplyr)
 
 #144
@@ -69,7 +69,7 @@ dataRT<- subset(data, data$key_resp_7.corr!=0 )
 
 #### ALTERNATIVELY, IT MIGHT BE SMARTER TO REPLACE THOSE TRIALS WITH NA IN ORDER TO KEEP ORDER IN THE COMING STEPS, CONSIDER USING/
  data2 <-data
- data2[] <- lapply(data2, function(x) ifelse(data2$slider_2.rt <1.5, NA, data2$slider_2.rt))
+ data2$slider_2.rt[] <- lapply(data2, function(x) ifelse(data2$slider_2.rt <1.5, NA, data2$slider_2.rt))
 # nope !!! Does shiiiiiiiiit.
  
  
